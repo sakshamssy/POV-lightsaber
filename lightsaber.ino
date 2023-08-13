@@ -17,6 +17,7 @@ const int pixelCount = 144;
 int arr[pixelCount][2*pixelCount];
 float angle = 0;
 int x,y;
+int AdjustedPixelCount;
 float angleRadian = angle*PI/180;
 int average_r, average_g, average_b;
 int currentImage = 12;
@@ -78,18 +79,21 @@ mpu.update();
   
 angle = mpu.getAngleZ();
 angleRadian = ((angle+90))*PI/180;
+AdjustedPixelCount = 64/(cos(angleRadian));
 //Serial.println((angle+90)%360);
   //Serial.println("Done");
   for(int i=0;i<pixelCount;i++){
     x = 64+(cos(angleRadian) * i);
     y = 127-(sin(angleRadian) * i);
-    average_r = (image[y*128 +x][0] + image[(y+1)*128 + x][0] + image[y*128 + x+1][0] + image[(y+1)*128 + x+1][0])/4;
-    average_g = (image[y*128 +x][1] + image[(y+1)*128 + x][1] + image[y*128 + x+1][1] + image[(y+1)*128 + x+1][1])/4;
-    average_b = (image[y*128 +x][2] + image[(y+1)*128 + x][2] + image[y*128 + x+1][2] + image[(y+1)*128 + x+1][2])/4;
-    //leds[i].setRGB( image[y*128 + x][0], image[y*128 + x][1], image[y*128 + x][2]);
-    leds[i].setRGB( average_r, average_g, average_b);
-    
-    
+    if (i <=AdjustedPixelCount){
+      average_r = (image[y*128 +x][0] + image[(y+1)*128 + x][0] + image[y*128 + x+1][0] + image[(y+1)*128 + x+1][0])/4;
+      average_g = (image[y*128 +x][1] + image[(y+1)*128 + x][1] + image[y*128 + x+1][1] + image[(y+1)*128 + x+1][1])/4;
+      average_b = (image[y*128 +x][2] + image[(y+1)*128 + x][2] + image[y*128 + x+1][2] + image[(y+1)*128 + x+1][2])/4;
+      //leds[i].setRGB( image[y*128 + x][0], image[y*128 + x][1], image[y*128 + x][2]);
+      leds[i].setRGB( average_r, average_g, average_b);  
+    }else {
+      leds[i].setRGB( 0, 0, 0);
+    }    
   }
   FastLED.show();
   
